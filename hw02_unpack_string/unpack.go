@@ -20,6 +20,12 @@ func Unpack(s string) (string, error) {
 			continue
 		}
 
+		if skipNext {
+			if !unicode.IsDigit(r) && string(r) != "\\" {
+				return "", ErrInvalidString
+			}
+		}
+
 		if unicode.IsDigit(r) && !skipNext {
 			if prev == "" {
 				return "", ErrInvalidString
@@ -50,6 +56,10 @@ func Unpack(s string) (string, error) {
 
 	if prev != "" {
 		result.WriteString(prev)
+	}
+
+	if skipNext {
+		return "", ErrInvalidString
 	}
 
 	return result.String(), nil
