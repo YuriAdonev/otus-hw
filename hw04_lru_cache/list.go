@@ -67,7 +67,7 @@ func (l *list) PushBack(v interface{}) *ListItem {
 		l.tail = item
 	}
 	l.length++
-	
+
 	return item
 }
 

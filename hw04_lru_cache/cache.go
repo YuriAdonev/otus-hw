@@ -21,10 +21,7 @@ type lruCache struct {
 
 func (c *lruCache) Set(key Key, value interface{}) bool {
 	item := c.items[key]
-	queue := &CacheItem{
-		Key: key,
-		Value: value,
-	}
+	queue := &CacheItem{Key: key, Value: value}
 	if item == nil {
 		if c.capacity == c.queue.Len() {
 			lastItem := c.queue.Back()
@@ -33,7 +30,7 @@ func (c *lruCache) Set(key Key, value interface{}) bool {
 			}
 			c.queue.Remove(lastItem)
 		}
-		
+
 		c.items[key] = c.queue.PushFront(queue)
 
 		return false
