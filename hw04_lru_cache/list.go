@@ -56,19 +56,29 @@ func (l *list) PushBack(v interface{}) *ListItem {
 	item := &ListItem{}
 	item.Value = v
 	if l.head == nil {
-		l.PushFront(item)
+		l.head = item
+		l.tail = item
+		item.Prev = nil
+		item.Next = nil
 	} else {
 		item.Prev = l.tail
 		item.Next = nil
 		l.tail.Next = item
 		l.tail = item
-		l.length++
 	}
-
+	l.length++
+	
 	return item
 }
 
 func (l *list) Remove(i *ListItem) {
+	if l.length == 1 {
+		l.tail = nil
+		l.head = nil
+		l.length--
+		return
+	}
+
 	if i.Next == nil {
 		l.tail = l.tail.Prev
 		l.tail.Next = nil
