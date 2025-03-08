@@ -20,36 +20,38 @@ type lruCache struct {
 }
 
 func (c *lruCache) Set(key Key, value interface{}) bool {
-	item := c.items[key]
 	queue := &CacheItem{Key: key, Value: value}
-	if item == nil {
-		if c.capacity == c.queue.Len() {
-			lastItem := c.queue.Back()
-			if lastItem != nil {
-				delete(c.items, lastItem.Value.(*CacheItem).Key)
-			}
-			c.queue.Remove(lastItem)
-		}
+	if item, exists := c.items[key]; exists {
+		item.Value = queue
+		c.queue.MoveToFront(item)
 
-		c.items[key] = c.queue.PushFront(queue)
+		return true
+	}
 
+	if c.capacity == 0 {
 		return false
 	}
 
-	item.Value = queue
-	c.queue.MoveToFront(item)
+	if c.capacity == c.queue.Len() {
+		lastItem := c.queue.Back()
+		if lastItem != nil {
+			delete(c.items, lastItem.Value.(*CacheItem).Key)
+		}
+		c.queue.Remove(lastItem)
+	}
 
-	return true
+	c.items[key] = c.queue.PushFront(queue)
+
+	return false
 }
 
 func (c *lruCache) Get(key Key) (interface{}, bool) {
-	item := c.items[key]
-	if item == nil {
-		return nil, false
+	if item, exists := c.items[key]; exists {
+		c.queue.MoveToFront(item)
+		return item.Value.(*CacheItem).Value, true
 	}
 
-	c.queue.MoveToFront(item)
-	return item.Value.(*CacheItem).Value, true
+	return nil, false
 }
 
 func (c *lruCache) Clear() {
