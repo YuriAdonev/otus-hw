@@ -18,6 +18,10 @@ func TestList(t *testing.T) {
 	t.Run("complex", func(t *testing.T) {
 		l := NewList()
 
+		l.PushFront(10)     // [10]
+		l.Remove(l.Front()) // []
+		require.Equal(t, 0, l.Len())
+
 		l.PushFront(10) // [10]
 		l.PushBack(20)  // [10, 20]
 		l.PushBack(30)  // [10, 20, 30]
@@ -39,13 +43,16 @@ func TestList(t *testing.T) {
 		require.Equal(t, 80, l.Front().Value)
 		require.Equal(t, 70, l.Back().Value)
 
-		l.MoveToFront(l.Front()) // [80, 60, 40, 10, 30, 50, 70]
-		l.MoveToFront(l.Back())  // [70, 80, 60, 40, 10, 30, 50]
+		l.MoveToFront(l.Front())     // [80, 60, 40, 10, 30, 50, 70]
+		l.MoveToFront(l.Back())      // [70, 80, 60, 40, 10, 30, 50]
+		l.Remove(l.Back())           // [70, 80, 60, 40, 10, 30]
+		l.Remove(l.Front())          // [80, 60, 40, 10, 30]
+		l.Remove(l.Back().Prev.Prev) // [80, 60, 10, 30]
 
 		elems := make([]int, 0, l.Len())
 		for i := l.Front(); i != nil; i = i.Next {
 			elems = append(elems, i.Value.(int))
 		}
-		require.Equal(t, []int{70, 80, 60, 40, 10, 30, 50}, elems)
+		require.Equal(t, []int{80, 60, 10, 30}, elems)
 	})
 }
